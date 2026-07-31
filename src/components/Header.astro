@@ -1,0 +1,102 @@
+---
+import Icon from './Icon.astro';
+import { NAV_ITEMS, SITE, withBase } from '../config';
+const pathname = Astro.url.pathname;
+---
+
+<header class="site-header">
+  <div class="container header-inner">
+    <a class="brand" href={withBase('/')} aria-label={`${SITE.title} 首页`}>
+      <span class="brand-mark">P</span>
+      <span>{SITE.title}</span>
+    </a>
+
+    <nav class="desktop-nav" aria-label="主导航">
+      {NAV_ITEMS.map((item) => (
+        <a class:list={{ active: pathname.includes(item.href) }} href={withBase(item.href)}>{item.label}</a>
+      ))}
+    </nav>
+
+    <div class="header-actions">
+      <a class="icon-button" href={withBase('/search')} aria-label="搜索"><Icon name="search" /></a>
+      <button class="icon-button theme-toggle" type="button" aria-label="切换深色模式">
+        <span class="sun"><Icon name="sun" /></span>
+        <span class="moon"><Icon name="moon" /></span>
+      </button>
+      <button class="icon-button menu-toggle" type="button" aria-label="打开导航菜单" aria-expanded="false" aria-controls="mobile-menu">
+        <span class="menu-icon"><Icon name="menu" /></span>
+        <span class="close-icon"><Icon name="close" /></span>
+      </button>
+    </div>
+  </div>
+  <nav id="mobile-menu" class="mobile-nav container" aria-label="移动端导航" hidden>
+    {NAV_ITEMS.map((item) => (
+      <a class:list={{ active: pathname.includes(item.href) }} href={withBase(item.href)}>{item.label}</a>
+    ))}
+  </nav>
+</header>
+
+<style>
+  .site-header { position: sticky; top: 0; z-index: 20; border-bottom: 1px solid transparent; background: color-mix(in srgb, var(--bg) 86%, transparent); backdrop-filter: blur(18px); }
+  .header-inner { display: flex; align-items: center; min-height: 72px; gap: 36px; }
+  .brand { display: flex; align-items: center; gap: 10px; margin-right: auto; font-weight: 700; letter-spacing: -.02em; }
+  .brand-mark { display: grid; place-items: center; width: 31px; height: 31px; border-radius: 9px 9px 9px 2px; background: var(--accent-strong); color: var(--bg); font-family: Georgia, serif; }
+  .desktop-nav { display: flex; align-items: center; gap: 28px; }
+  .desktop-nav a { position: relative; color: var(--muted); font-size: .9rem; font-weight: 600; }
+  .desktop-nav a:hover, .desktop-nav a.active { color: var(--text); }
+  .desktop-nav a.active::after { content: ''; position: absolute; left: 0; right: 0; bottom: -8px; height: 2px; border-radius: 2px; background: var(--accent); }
+  .header-actions { display: flex; align-items: center; gap: 6px; }
+  .icon-button { display: grid; place-items: center; width: 38px; height: 38px; padding: 0; border: 0; border-radius: 50%; color: var(--muted); background: transparent; cursor: pointer; }
+  .icon-button:hover { color: var(--text); background: var(--surface-soft); }
+  .moon { display: none; }
+  :global(:root[data-theme='dark']) .sun { display: none; }
+  :global(:root[data-theme='dark']) .moon { display: inline-flex; }
+  .menu-toggle, .mobile-nav { display: none; }
+  .close-icon { display: none; }
+  .menu-toggle[aria-expanded='true'] .menu-icon { display: none; }
+  .menu-toggle[aria-expanded='true'] .close-icon { display: inline-flex; }
+  @media (max-width: 720px) {
+    .header-inner { gap: 12px; }
+    .desktop-nav { display: none; }
+    .brand { margin-right: auto; }
+    .menu-toggle { display: grid; }
+    .mobile-nav:not([hidden]) { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; padding-top: 8px; padding-bottom: 18px; border-top: 1px solid var(--line); }
+    .mobile-nav a { border-radius: 10px; padding: 11px 12px; color: var(--muted); font-size: .92rem; font-weight: 600; }
+    .mobile-nav a:hover, .mobile-nav a.active { color: var(--text); background: var(--surface-soft); }
+  }
+</style>
+
+<script>
+  const button = document.querySelector<HTMLButtonElement>('.theme-toggle');
+  button?.addEventListener('click', () => {
+    const root = document.documentElement;
+    const next = root.dataset.theme === 'dark' ? 'light' : 'dark';
+    root.dataset.theme = next;
+    localStorage.setItem('theme', next);
+  });
+
+  const menuButton = document.querySelector<HTMLButtonElement>('.menu-toggle');
+  const mobileMenu = document.querySelector<HTMLElement>('#mobile-menu');
+  const closeMenu = () => {
+    if (!menuButton || !mobileMenu) return;
+    menuButton.setAttribute('aria-expanded', 'false');
+    menuButton.setAttribute('aria-label', '打开导航菜单');
+    mobileMenu.hidden = true;
+  };
+
+  menuButton?.addEventListener('click', () => {
+    if (!mobileMenu) return;
+    const open = menuButton.getAttribute('aria-expanded') === 'true';
+    menuButton.setAttribute('aria-expanded', String(!open));
+    menuButton.setAttribute('aria-label', open ? '打开导航菜单' : '关闭导航菜单');
+    mobileMenu.hidden = open;
+  });
+
+  mobileMenu?.addEventListener('click', (event) => {
+    if ((event.target as Element).closest('a')) closeMenu();
+  });
+
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') closeMenu();
+  });
+</script>

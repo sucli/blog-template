@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <rect width="1200" height="630" fill="#f2f1e9"/>
+  <circle cx="1020" cy="70" r="330" fill="#dce9df"/>
+  <path d="M0 540C220 430 390 430 620 540s390 90 580-20v110H0Z" fill="#284035"/>
+  <text x="90" y="250" font-family="Georgia,serif" font-size="112" fill="#171a18">Paperwind</text>
+  <text x="96" y="322" font-family="Arial,sans-serif" font-size="30" fill="#68706a" letter-spacing="3">IDEAS · TECHNOLOGY · LIFE</text>
+</svg>

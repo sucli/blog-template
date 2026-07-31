@@ -1,0 +1,26 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getAllTags, tagToSlug, visiblePosts } from '../../utils/posts';
+import { withBase } from '../../config';
+const tags = getAllTags(visiblePosts(await getCollection('posts')));
+---
+
+<BaseLayout title="标签" description="按主题浏览文章。">
+  <div class="container">
+    <header class="page-heading"><p class="eyebrow">Browse topics</p><h1>标签</h1><p>沿着感兴趣的主题，找到更多内容。</p></header>
+    <div class="tag-cloud">
+      {tags.map((tag) => <a href={withBase(`/tags/${tagToSlug(tag.name)}`)}><span>#{tag.name}</span><small>{tag.count} 篇</small></a>)}
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .tag-cloud { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  .tag-cloud a { display: flex; align-items: center; justify-content: space-between; border: 1px solid var(--line); border-radius: 16px; padding: 20px; background: var(--surface); transition: .2s ease; }
+  .tag-cloud a:hover { transform: translateY(-3px); border-color: var(--accent); box-shadow: var(--shadow); }
+  .tag-cloud span { font-weight: 700; }
+  .tag-cloud small { color: var(--muted); }
+  @media (max-width: 760px) { .tag-cloud { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 480px) { .tag-cloud { grid-template-columns: 1fr; } }
+</style>

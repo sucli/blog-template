@@ -1,0 +1,26 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { SITE } from '../config';
+---
+
+<BaseLayout title="关于" description={`关于 ${SITE.author} 与这个博客。`}>
+  <div class="container about-grid">
+    <header class="page-heading"><p class="eyebrow">About this place</p><h1>你好，我是<br />{SITE.author}。</h1></header>
+    <div class="prose about-copy">
+      <p>欢迎来到 {SITE.title}。这里用来记录我正在学习的技术、值得分享的创作过程，以及那些不想被时间冲走的想法。</p>
+      <h2>为什么写作</h2>
+      <p>写作迫使人把模糊的直觉变成清晰的表达。公开写作还能让知识流动起来，连接到拥有相似问题和兴趣的人。</p>
+      <h2>联系我</h2>
+      <p>如果你想讨论文章中的内容、指出错误或只是打个招呼，可以发送邮件到 <a href={`mailto:${SITE.email}`}>{SITE.email}</a>。</p>
+      <p><em>提示：请在 <code>src/config.ts</code> 和本页面中替换这些示例文字。</em></p>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .about-grid { display: grid; grid-template-columns: minmax(280px, .8fr) minmax(0, 1fr); gap: clamp(40px, 10vw, 130px); padding-top: 50px; }
+  .page-heading { padding-top: 20px; }
+  .page-heading h1 { font-size: clamp(3rem, 7vw, 5.3rem); }
+  .about-copy { margin: 0; padding-top: 30px; }
+  @media (max-width: 760px) { .about-grid { grid-template-columns: 1fr; gap: 0; } .about-copy { padding-top: 0; } }
+</style>

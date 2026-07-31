@@ -1,0 +1,38 @@
+---
+import { withBase } from '../config';
+
+interface Props {
+  currentPage: number;
+  totalPages: number;
+}
+
+const { currentPage, totalPages } = Astro.props;
+const pageHref = (page: number) => withBase(page === 1 ? '/posts' : `/posts/page/${page}`);
+---
+
+{totalPages > 1 && (
+  <nav class="pagination" aria-label="文章分页">
+    {currentPage > 1 ? <a class="page-control" href={pageHref(currentPage - 1)}>← 上一页</a> : <span class="page-control disabled" aria-disabled="true">← 上一页</span>}
+    <div class="page-numbers">
+      {Array.from({ length: totalPages }, (_, index) => index + 1).map((page) => (
+        <a class:list={{ current: page === currentPage }} href={pageHref(page)} aria-current={page === currentPage ? 'page' : undefined}>{page}</a>
+      ))}
+    </div>
+    {currentPage < totalPages ? <a class="page-control" href={pageHref(currentPage + 1)}>下一页 →</a> : <span class="page-control disabled" aria-disabled="true">下一页 →</span>}
+  </nav>
+)}
+
+<style>
+  .pagination { display: flex; align-items: center; justify-content: space-between; gap: 18px; margin-top: 72px; padding-top: 28px; border-top: 1px solid var(--line); }
+  .page-numbers { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 6px; }
+  .page-numbers a { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 50%; color: var(--muted); font-size: .88rem; font-weight: 700; }
+  .page-numbers a:hover { color: var(--text); background: var(--surface-soft); }
+  .page-numbers a.current { color: var(--bg); background: var(--accent-strong); }
+  .page-control { color: var(--text); font-size: .88rem; font-weight: 700; white-space: nowrap; }
+  a.page-control:hover { color: var(--accent); }
+  .disabled { color: var(--muted); opacity: .45; }
+  @media (max-width: 560px) {
+    .pagination { align-items: stretch; flex-wrap: wrap; }
+    .page-numbers { order: -1; width: 100%; }
+  }
+</style>

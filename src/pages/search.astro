@@ -1,0 +1,72 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Icon from '../components/Icon.astro';
+import { formatDate, visiblePosts } from '../utils/posts';
+import { withBase } from '../config';
+const posts = visiblePosts(await getCollection('posts'));
+---
+
+<BaseLayout title="搜索" description="搜索站内文章。">
+  <div class="container search-wrap">
+    <header class="page-heading"><p class="eyebrow">Find a story</p><h1>搜索</h1><p>输入标题、摘要或标签。</p></header>
+    <label class="search-box">
+      <span class="visually-hidden">搜索文章</span>
+      <Icon name="search" />
+      <input id="search-input" type="search" placeholder="例如：Astro、部署、写作…" autocomplete="off" autofocus />
+      <kbd aria-hidden="true">⌘ K</kbd>
+    </label>
+    <p id="search-count" class="count" aria-live="polite" aria-atomic="true">共 {posts.length} 篇文章</p>
+    <div id="search-results" class="results">
+      {posts.map((post) => (
+        <article data-search={`${post.data.title} ${post.data.description} ${post.data.tags.join(' ')}`.toLocaleLowerCase()}>
+          <div><time>{formatDate(post.data.pubDate)}</time><h2><a href={withBase(`/posts/${post.id}`)}>{post.data.title}</a></h2><p>{post.data.description}</p></div>
+          <span>→</span>
+        </article>
+      ))}
+    </div>
+    <div id="search-empty" class="empty-state" hidden>没有找到相关文章，换个关键词试试。</div>
+  </div>
+</BaseLayout>
+
+<style>
+  .search-wrap { max-width: 860px; }
+  .search-box { display: flex; align-items: center; gap: 12px; border: 1px solid var(--line); border-radius: 16px; padding: 0 18px; background: var(--surface); box-shadow: var(--shadow); }
+  .search-box:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft), var(--shadow); }
+  .search-box input { width: 100%; border: 0; outline: 0; padding: 17px 0; color: var(--text); background: transparent; }
+  .search-box kbd { border: 1px solid var(--line); border-radius: 6px; padding: 2px 7px; color: var(--muted); background: var(--surface-soft); font-size: .72rem; white-space: nowrap; }
+  .count { margin: 20px 2px; color: var(--muted); font-size: .82rem; }
+  .results { border-top: 1px solid var(--line); }
+  article { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 25px 4px; border-bottom: 1px solid var(--line); }
+  article[hidden] { display: none; }
+  time { color: var(--muted); font-size: .78rem; }
+  h2 { margin: 4px 0; font-size: 1.25rem; letter-spacing: -.025em; }
+  h2 a:hover { color: var(--accent); }
+  article p { margin: 0; color: var(--muted); font-size: .88rem; }
+  article > span { color: var(--muted); }
+</style>
+
+<script>
+  const input = document.querySelector<HTMLInputElement>('#search-input');
+  const items = [...document.querySelectorAll<HTMLElement>('[data-search]')];
+  const count = document.querySelector<HTMLElement>('#search-count');
+  const empty = document.querySelector<HTMLElement>('#search-empty');
+  const update = () => {
+    const query = input?.value.trim().toLocaleLowerCase() ?? '';
+    let visible = 0;
+    for (const item of items) {
+      const match = !query || item.dataset.search?.includes(query);
+      item.hidden = !match;
+      if (match) visible++;
+    }
+    if (count) count.textContent = query ? `找到 ${visible} 篇文章` : `共 ${visible} 篇文章`;
+    if (empty) empty.hidden = visible !== 0;
+  };
+  input?.addEventListener('input', update);
+  document.addEventListener('keydown', (event) => {
+    if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
+      event.preventDefault();
+      input?.focus();
+    }
+  });
+</script>

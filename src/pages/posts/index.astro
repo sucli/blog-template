@@ -1,0 +1,25 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PostCard from '../../components/PostCard.astro';
+import Pagination from '../../components/Pagination.astro';
+import { SITE } from '../../config';
+import { visiblePosts } from '../../utils/posts';
+const posts = visiblePosts(await getCollection('posts'));
+const totalPages = Math.ceil(posts.length / SITE.postsPerPage);
+const pagePosts = posts.slice(0, SITE.postsPerPage);
+---
+
+<BaseLayout title="全部文章" description="浏览所有已发布的文章。">
+  <div class="container">
+    <header class="page-heading"><p class="eyebrow">All stories</p><h1>全部文章</h1><p>共 {posts.length} 篇文章，关于技术、创作和日常思考。</p></header>
+    {pagePosts.length ? <div class="post-grid">{pagePosts.map((post) => <PostCard post={post} />)}</div> : <div class="empty-state">还没有文章。添加一篇 Markdown 开始写作吧。</div>}
+    <Pagination currentPage={1} totalPages={totalPages} />
+  </div>
+</BaseLayout>
+
+<style>
+  .post-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 56px 28px; }
+  @media (max-width: 820px) { .post-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 560px) { .post-grid { grid-template-columns: 1fr; } }
+</style>

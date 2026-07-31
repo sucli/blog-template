@@ -1,0 +1,43 @@
+---
+title: 为什么选择 Astro 构建内容网站
+description: 从性能、内容管理和开发体验三个角度，理解 Astro 为什么适合博客。
+pubDate: 2026-07-25
+tags: [Astro, 前端, 性能]
+cover: /covers/astro.png
+coverAlt: 深色背景上的星轨抽象图形
+---
+
+内容网站和交互型应用面对的是两类不同的问题。博客最重要的是让读者快速看到文字，而不是先下载一整套客户端框架。
+
+## 默认发送更少的 JavaScript
+
+Astro 的组件会在构建时渲染成 HTML。除非明确使用客户端指令，否则组件不会把 JavaScript 发送给浏览器。这种“默认静态”的模型特别适合文章、文档和营销页面。
+
+| 需求 | Astro 的处理方式 |
+| --- | --- |
+| 普通内容 | 构建为静态 HTML |
+| 局部交互 | 按需加载组件 |
+| Markdown | 内建内容集合支持 |
+| SEO | 完整控制页面 `<head>` |
+
+## 内容集合带来的确定性
+
+模板在 `src/content.config.ts` 中定义了每篇文章需要的字段。日期格式错误、遗漏标题或者填入了错误的数据类型，都会在构建阶段被发现。
+
+```ts
+const posts = defineCollection({
+  schema: z.object({
+    title: z.string(),
+    pubDate: z.coerce.date(),
+    tags: z.array(z.string())
+  })
+});
+```
+
+这让纯文本写作拥有了类似数据库字段约束的可靠性，又保留了 Markdown 的可移植性。
+
+## 需要交互时依然灵活
+
+静态优先并不意味着不能做交互。搜索和主题切换只用了少量原生 JavaScript；如果以后需要复杂组件，也可以加入 React、Vue 或 Svelte，并只在组件真正出现的页面加载它们。
+
+对大多数个人博客来说，这是性能与开发体验之间很舒服的平衡点。

@@ -1,0 +1,27 @@
+---
+import Icon from './Icon.astro';
+import { SITE, withBase } from '../config';
+---
+
+<footer>
+  <div class="container footer-inner">
+    <div>
+      <strong>{SITE.title}</strong>
+      <p>© {new Date().getFullYear()} {SITE.author}. Built with Astro.</p>
+    </div>
+    <div class="links">
+      <a href={SITE.social.github} aria-label="GitHub"><Icon name="github" /></a>
+      <a href={withBase('/rss.xml')} aria-label="RSS"><Icon name="rss" /></a>
+    </div>
+  </div>
+</footer>
+
+<style>
+  footer { margin-top: 90px; border-top: 1px solid var(--line); }
+  .footer-inner { display: flex; align-items: center; justify-content: space-between; min-height: 130px; gap: 20px; }
+  strong { font-size: .95rem; }
+  p { margin: 3px 0 0; color: var(--muted); font-size: .82rem; }
+  .links { display: flex; gap: 8px; }
+  .links a { display: grid; place-items: center; width: 38px; height: 38px; border: 1px solid var(--line); border-radius: 50%; color: var(--muted); }
+  .links a:hover { color: var(--text); border-color: var(--accent); }
+</style>

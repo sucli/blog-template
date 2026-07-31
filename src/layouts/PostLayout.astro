@@ -1,0 +1,65 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import type { Post } from '../utils/posts';
+import { formatDate, getReadingTime, tagToSlug } from '../utils/posts';
+import { SITE, withBase } from '../config';
+
+interface Props { post: Post }
+const { post } = Astro.props;
+const cover = post.data.cover ? withBase(post.data.cover) : undefined;
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'BlogPosting',
+  headline: post.data.title,
+  description: post.data.description,
+  datePublished: post.data.pubDate.toISOString(),
+  dateModified: (post.data.updatedDate ?? post.data.pubDate).toISOString(),
+  author: { '@type': 'Person', name: SITE.author },
+  mainEntityOfPage: new URL(Astro.url.pathname, Astro.site).href
+};
+---
+
+<BaseLayout title={post.data.title} description={post.data.description} image={post.data.cover} imageAlt={post.data.coverAlt} article>
+  <script is:inline type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+  <article>
+    <header class="post-header container">
+      <div class="post-tags">
+        {post.data.tags.map((tag) => <a class="pill" href={withBase(`/tags/${tagToSlug(tag)}`)}>#{tag}</a>)}
+      </div>
+      <h1>{post.data.title}</h1>
+      <p class="description">{post.data.description}</p>
+      <div class="post-meta">
+        <span>{SITE.author}</span>
+        <span class="dot"></span>
+        <time datetime={post.data.pubDate.toISOString()}>{formatDate(post.data.pubDate)}</time>
+        <span class="dot"></span>
+        <span>{getReadingTime(post)} 分钟阅读</span>
+      </div>
+    </header>
+
+    {cover && <div class="hero-image container"><img src={cover} alt={post.data.coverAlt ?? ''} /></div>}
+
+    <div class="prose"><slot /></div>
+
+    <footer class="post-footer prose">
+      <p>感谢阅读。如果这篇文章对你有帮助，欢迎通过 RSS 订阅后续内容。</p>
+      <a class="button secondary" href={withBase('/posts')}>← 返回全部文章</a>
+    </footer>
+  </article>
+</BaseLayout>
+
+<style>
+  .post-header { max-width: 900px; padding-top: 76px; text-align: center; }
+  .post-tags { display: flex; justify-content: center; flex-wrap: wrap; gap: 8px; }
+  h1 { max-width: 850px; margin: 24px auto 18px; font-size: clamp(2.6rem, 7vw, 5.7rem); line-height: 1.02; letter-spacing: -.065em; text-wrap: balance; }
+  .description { max-width: 650px; margin: 0 auto; color: var(--muted); font-size: clamp(1rem, 2vw, 1.2rem); }
+  .post-meta { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 10px; margin-top: 26px; color: var(--muted); font-size: .84rem; }
+  .dot { width: 3px; height: 3px; border-radius: 50%; background: var(--muted); }
+  .hero-image { margin-top: 56px; margin-bottom: 64px; }
+  .hero-image img { width: 100%; max-height: 620px; object-fit: cover; border-radius: clamp(18px, 3vw, 30px); box-shadow: var(--shadow); }
+  .post-footer { margin-top: 56px; padding-top: 30px; border-top: 1px solid var(--line); }
+  @media (max-width: 680px) {
+    .post-header { padding-top: 48px; }
+    .hero-image { margin-top: 36px; margin-bottom: 42px; }
+  }
+</style>
