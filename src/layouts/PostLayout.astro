@@ -1,26 +1,50 @@
 ---
 import BaseLayout from './BaseLayout.astro';
+import type { MarkdownHeading } from 'astro';
 import type { Post } from '../utils/posts';
-import { formatDate, getReadingTime, tagToSlug } from '../utils/posts';
+import { formatDate, getReadingTime, seriesToSlug, tagToSlug } from '../utils/posts';
 import { SITE, withBase } from '../config';
 
-interface Props { post: Post }
-const { post } = Astro.props;
+interface Props {
+  post: Post;
+  headings?: MarkdownHeading[];
+  previousPost?: Post;
+  nextPost?: Post;
+  seriesPosts?: Post[];
+}
+const { post, headings = [], previousPost, nextPost, seriesPosts = [] } = Astro.props;
 const cover = post.data.cover ? withBase(post.data.cover) : undefined;
+const modifiedDate = post.data.updatedDate ?? post.data.pubDate;
+const tableOfContents = headings.filter((heading) => heading.depth === 2 || heading.depth === 3);
 const jsonLd = {
   '@context': 'https://schema.org',
   '@type': 'BlogPosting',
   headline: post.data.title,
   description: post.data.description,
   datePublished: post.data.pubDate.toISOString(),
-  dateModified: (post.data.updatedDate ?? post.data.pubDate).toISOString(),
+  dateModified: modifiedDate.toISOString(),
   author: { '@type': 'Person', name: SITE.author },
-  mainEntityOfPage: new URL(Astro.url.pathname, Astro.site).href
+  mainEntityOfPage: new URL(Astro.url.pathname, Astro.site).href,
+  ...(cover ? { image: new URL(cover, Astro.site).href } : {})
 };
+const serializedJsonLd = JSON.stringify(jsonLd).replace(/</g, '\\u003c');
+const seriesIndex = seriesPosts.findIndex((entry) => entry.id === post.id);
+const seriesPrevious = seriesIndex > 0 ? seriesPosts[seriesIndex - 1] : undefined;
+const seriesNext = seriesIndex >= 0 ? seriesPosts[seriesIndex + 1] : undefined;
 ---
 
-<BaseLayout title={post.data.title} description={post.data.description} image={post.data.cover} imageAlt={post.data.coverAlt} article>
-  <script is:inline type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+<BaseLayout
+  title={post.data.title}
+  description={post.data.description}
+  image={post.data.cover}
+  imageAlt={post.data.coverAlt}
+  socialImage={`/og/${post.id}.svg`}
+  article
+  publishedTime={post.data.pubDate}
+  modifiedTime={modifiedDate}
+  tags={post.data.tags}
+>
+  <script is:inline type="application/ld+json" set:html={serializedJsonLd} />
   <article>
     <header class="post-header container">
       <div class="post-tags">
@@ -32,19 +56,51 @@ const jsonLd = {
         <span>{SITE.author}</span>
         <span class="dot"></span>
         <time datetime={post.data.pubDate.toISOString()}>{formatDate(post.data.pubDate)}</time>
+        {post.data.updatedDate && <><span class="dot"></span><time datetime={post.data.updatedDate.toISOString()}>更新于 {formatDate(post.data.updatedDate)}</time></>}
         <span class="dot"></span>
         <span>{getReadingTime(post)} 分钟阅读</span>
       </div>
     </header>
 
-    {cover && <div class="hero-image container"><img src={cover} alt={post.data.coverAlt ?? ''} /></div>}
+    {cover && <div class="hero-image container"><img src={cover} alt={post.data.coverAlt ?? ''} width="1200" height="760" loading="eager" decoding="async" /></div>}
+
+    {tableOfContents.length > 0 && (
+      <nav class="toc prose" aria-label="文章目录">
+        <strong>文章目录</strong>
+        <ol>
+          {tableOfContents.map((heading) => (
+            <li class:list={{ nested: heading.depth === 3 }}><a href={`#${heading.slug}`}>{heading.text}</a></li>
+          ))}
+        </ol>
+      </nav>
+    )}
 
     <div class="prose"><slot /></div>
+
+    {post.data.series && (
+      <aside class="series-box container">
+        <div><p class="eyebrow">Article series</p><h2><a href={withBase(`/series/${seriesToSlug(post.data.series)}`)}>{post.data.series}</a></h2></div>
+        <p>第 {post.data.seriesOrder ?? seriesIndex + 1} 篇，共 {seriesPosts.length} 篇</p>
+        <nav aria-label="系列文章导航">
+          {seriesPrevious ? <a href={withBase(`/posts/${seriesPrevious.id}`)}>← {seriesPrevious.data.title}</a> : <span></span>}
+          {seriesNext ? <a href={withBase(`/posts/${seriesNext.id}`)}>{seriesNext.data.title} →</a> : <span></span>}
+        </nav>
+      </aside>
+    )}
 
     <footer class="post-footer prose">
       <p>感谢阅读。如果这篇文章对你有帮助，欢迎通过 RSS 订阅后续内容。</p>
       <a class="button secondary" href={withBase('/posts')}>← 返回全部文章</a>
     </footer>
+
+    {(previousPost || nextPost) && (
+      <nav class="post-navigation container" aria-label="相邻文章">
+        {previousPost
+          ? <a href={withBase(`/posts/${previousPost.id}`)}><span>较新一篇</span><strong>{previousPost.data.title}</strong></a>
+          : <span></span>}
+        {nextPost && <a class="next" href={withBase(`/posts/${nextPost.id}`)}><span>较早一篇</span><strong>{nextPost.data.title}</strong></a>}
+      </nav>
+    )}
   </article>
 </BaseLayout>
 
@@ -57,9 +113,32 @@ const jsonLd = {
   .dot { width: 3px; height: 3px; border-radius: 50%; background: var(--muted); }
   .hero-image { margin-top: 56px; margin-bottom: 64px; }
   .hero-image img { width: 100%; max-height: 620px; object-fit: cover; border-radius: clamp(18px, 3vw, 30px); box-shadow: var(--shadow); }
+  .toc { margin-bottom: 48px; padding: 22px 0; border-block: 1px solid var(--line); }
+  .toc strong { font-size: .86rem; }
+  .toc ol { display: grid; gap: 6px; margin: 12px 0 0; padding-left: 1.2rem; }
+  .toc li { color: var(--muted); font-size: .9rem; }
+  .toc li.nested { margin-left: 18px; }
+  .toc a { color: inherit; text-decoration: none; }
+  .toc a:hover { color: var(--accent); }
   .post-footer { margin-top: 56px; padding-top: 30px; border-top: 1px solid var(--line); }
+  .series-box { margin-top: 52px; padding: 24px; border: 1px solid var(--line); border-radius: 16px; background: var(--surface-soft); }
+  .series-box h2 { margin: 0; font-size: 1.3rem; }
+  .series-box h2 a:hover { color: var(--accent); }
+  .series-box > p { margin: 4px 0 18px; color: var(--muted); font-size: .88rem; }
+  .series-box nav { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; border-top: 1px solid var(--line); padding-top: 16px; font-size: .88rem; }
+  .series-box nav a:hover { color: var(--accent); }
+  .series-box nav a:last-child { text-align: right; }
+  .post-navigation { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px; margin-top: 58px; padding-top: 28px; border-top: 1px solid var(--line); }
+  .post-navigation a { display: grid; gap: 5px; }
+  .post-navigation a.next { text-align: right; }
+  .post-navigation span { color: var(--muted); font-size: .78rem; }
+  .post-navigation strong { font-size: 1rem; }
+  .post-navigation a:hover strong { color: var(--accent); }
   @media (max-width: 680px) {
     .post-header { padding-top: 48px; }
     .hero-image { margin-top: 36px; margin-bottom: 42px; }
+    .post-navigation { grid-template-columns: 1fr; }
+    .post-navigation > span:empty { display: none; }
+    .post-navigation a.next { text-align: left; }
   }
 </style>

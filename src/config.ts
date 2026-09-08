@@ -1,18 +1,14 @@
-export const SITE = {
-  title: 'Paperwind',
-  description: '记录技术、创作与日常思考的独立博客。',
-  author: 'Your Name',
-  email: 'hello@example.com',
-  locale: 'zh-CN',
-  postsPerPage: 9,
-  social: {
-    github: 'https://github.com/your-name',
-    x: 'https://x.com/your-name'
-  }
-} as const;
+import siteConfig from '../site.config.json';
+
+if (!Number.isInteger(siteConfig.postsPerPage) || siteConfig.postsPerPage < 1) {
+  throw new Error('site.config.json: postsPerPage must be a positive integer');
+}
+
+export const SITE = siteConfig;
 
 export const NAV_ITEMS = [
   { label: '文章', href: '/posts' },
+  { label: '系列', href: '/series' },
   { label: '标签', href: '/tags' },
   { label: '归档', href: '/archive' },
   { label: '关于', href: '/about' }

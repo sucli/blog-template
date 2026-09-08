@@ -3,6 +3,8 @@ title: 用 GitHub Pages 自动发布博客
 description: 从模板仓库到公开网站，一次推送即可完成构建与部署。
 pubDate: 2026-07-18
 tags: [部署, GitHub, CI/CD]
+series: Astro 内容网站实践
+seriesOrder: 2
 cover: /covers/deploy.png
 coverAlt: 表示代码自动流向网页的抽象图形
 ---

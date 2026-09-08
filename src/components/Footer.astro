@@ -10,7 +10,8 @@ import { SITE, withBase } from '../config';
       <p>© {new Date().getFullYear()} {SITE.author}. Built with Astro.</p>
     </div>
     <div class="links">
-      <a href={SITE.social.github} aria-label="GitHub"><Icon name="github" /></a>
+      {SITE.social.github && <a href={SITE.social.github} aria-label="GitHub"><Icon name="github" /></a>}
+      {SITE.social.x && <a href={SITE.social.x} aria-label="X"><Icon name="x" /></a>}
       <a href={withBase('/rss.xml')} aria-label="RSS"><Icon name="rss" /></a>
     </div>
   </div>

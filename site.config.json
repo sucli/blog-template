@@ -1,0 +1,13 @@
+{
+  "title": "Paperwind",
+  "description": "记录技术、创作与日常思考的独立博客。",
+  "author": "Your Name",
+  "email": "hello@example.com",
+  "locale": "zh-CN",
+  "siteUrl": "https://example.com",
+  "postsPerPage": 9,
+  "social": {
+    "github": "https://github.com/your-name",
+    "x": "https://x.com/your-name"
+  }
+}

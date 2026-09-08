@@ -1,0 +1,22 @@
+---
+interface Props {
+  type?: 'info' | 'tip' | 'warning';
+  title?: string;
+}
+
+const { type = 'info', title } = Astro.props;
+const labels = { info: '提示', tip: '建议', warning: '注意' };
+---
+
+<aside class:list={['callout', `callout-${type}`]}>
+  <strong>{title ?? labels[type]}</strong>
+  <div><slot /></div>
+</aside>
+
+<style>
+  .callout { margin: 1.8em 0; padding: 16px 18px; border-left: 4px solid var(--accent); border-radius: 0 12px 12px 0; background: var(--accent-soft); }
+  .callout strong { display: block; margin-bottom: 4px; }
+  .callout :global(p) { margin: 0; }
+  .callout-warning { border-color: #b97928; background: color-mix(in srgb, #b97928 12%, var(--surface)); }
+  .callout-tip { border-color: #347a58; }
+</style>

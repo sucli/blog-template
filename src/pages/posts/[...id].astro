@@ -1,15 +1,24 @@
 ---
 import { getCollection, render } from 'astro:content';
 import PostLayout from '../../layouts/PostLayout.astro';
-import { visiblePosts } from '../../utils/posts';
+import { getSeries, visiblePosts } from '../../utils/posts';
 
 export async function getStaticPaths() {
   const posts = visiblePosts(await getCollection('posts'));
-  return posts.map((post) => ({ params: { id: post.id }, props: { post } }));
+  const seriesMap = new Map(getSeries(posts).map((item) => [item.name, item.posts]));
+  return posts.map((post, index) => ({
+    params: { id: post.id },
+    props: {
+      post,
+      previousPost: posts[index - 1],
+      nextPost: posts[index + 1],
+      seriesPosts: post.data.series ? seriesMap.get(post.data.series) ?? [] : []
+    }
+  }));
 }
 
-const { post } = Astro.props;
-const { Content } = await render(post);
+const { post, previousPost, nextPost, seriesPosts } = Astro.props;
+const { Content, headings } = await render(post);
 ---
 
-<PostLayout post={post}><Content /></PostLayout>
+<PostLayout post={post} headings={headings} previousPost={previousPost} nextPost={nextPost} seriesPosts={seriesPosts}><Content /></PostLayout>

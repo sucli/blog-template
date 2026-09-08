@@ -7,8 +7,16 @@ export function sortPosts(posts: Post[]) {
   return [...posts].sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
 }
 
-export function visiblePosts(posts: Post[]) {
-  return sortPosts(posts.filter((post) => import.meta.env.DEV || !post.data.draft));
+interface VisibilityOptions {
+  includeUnpublished?: boolean;
+  now?: Date;
+}
+
+export function visiblePosts(
+  posts: Post[],
+  { includeUnpublished = import.meta.env.DEV, now = new Date() }: VisibilityOptions = {}
+) {
+  return sortPosts(posts.filter((post) => includeUnpublished || (!post.data.draft && post.data.pubDate <= now)));
 }
 
 export function getReadingTime(post: Post) {
@@ -22,7 +30,16 @@ export function formatDate(date: Date) {
   return new Intl.DateTimeFormat(SITE.locale, {
     year: 'numeric',
     month: 'long',
-    day: 'numeric'
+    day: 'numeric',
+    timeZone: 'UTC'
+  }).format(date);
+}
+
+export function formatMonthDay(date: Date) {
+  return new Intl.DateTimeFormat(SITE.locale, {
+    month: 'long',
+    day: 'numeric',
+    timeZone: 'UTC'
   }).format(date);
 }
 
@@ -33,7 +50,7 @@ export function getAllTags(posts: Post[]) {
   }
   return [...counts.entries()]
     .map(([name, count]) => ({ name, count }))
-    .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name, 'zh-CN'));
+    .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name, SITE.locale));
 }
 
 export function tagToSlug(tag: string) {
@@ -50,4 +67,30 @@ export function tagToSlug(tag: string) {
   }
 
   return `${readable}-${(hash >>> 0).toString(36)}`;
+}
+
+export function getSeries(posts: Post[]) {
+  const series = new Map<string, Post[]>();
+  for (const post of posts) {
+    const name = post.data.series;
+    if (!name) continue;
+    const entries = series.get(name) ?? [];
+    entries.push(post);
+    series.set(name, entries);
+  }
+
+  return [...series.entries()]
+    .map(([name, entries]) => ({
+      name,
+      posts: [...entries].sort((a, b) => {
+        const aOrder = a.data.seriesOrder ?? Number.MAX_SAFE_INTEGER;
+        const bOrder = b.data.seriesOrder ?? Number.MAX_SAFE_INTEGER;
+        return aOrder - bOrder || a.data.pubDate.valueOf() - b.data.pubDate.valueOf();
+      })
+    }))
+    .sort((a, b) => a.name.localeCompare(b.name, SITE.locale));
+}
+
+export function seriesToSlug(series: string) {
+  return tagToSlug(series);
 }

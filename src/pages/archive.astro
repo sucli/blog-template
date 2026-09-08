@@ -1,11 +1,11 @@
 ---
 import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { formatDate, visiblePosts } from '../utils/posts';
+import { formatMonthDay, visiblePosts } from '../utils/posts';
 import { withBase } from '../config';
 
 const posts = visiblePosts(await getCollection('posts'));
-const groups = Object.entries(Object.groupBy(posts, (post) => String(post.data.pubDate.getFullYear())))
+const groups = Object.entries(Object.groupBy(posts, (post) => String(post.data.pubDate.getUTCFullYear())))
   .sort(([a], [b]) => Number(b) - Number(a));
 ---
 
@@ -19,7 +19,7 @@ const groups = Object.entries(Object.groupBy(posts, (post) => String(post.data.p
           <div class="year-posts">
             {yearPosts?.map((post) => (
               <a href={withBase(`/posts/${post.id}`)}>
-                <time datetime={post.data.pubDate.toISOString()}>{formatDate(post.data.pubDate).replace(`${year}年`, '')}</time>
+                <time datetime={post.data.pubDate.toISOString()}>{formatMonthDay(post.data.pubDate)}</time>
                 <strong>{post.data.title}</strong>
                 <span>→</span>
               </a>

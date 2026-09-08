@@ -1,0 +1,32 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PostCard from '../../components/PostCard.astro';
+import { getSeries, seriesToSlug, visiblePosts } from '../../utils/posts';
+import { withBase } from '../../config';
+
+export async function getStaticPaths() {
+  return getSeries(visiblePosts(await getCollection('posts'))).map((item) => ({
+    params: { series: seriesToSlug(item.name) },
+    props: item
+  }));
+}
+
+const { name, posts } = Astro.props;
+---
+
+<BaseLayout title={name} description={`系列文章：${name}。`}>
+  <div class="container">
+    <header class="page-heading"><p class="eyebrow">Article series</p><h1>{name}</h1><p>{posts.length} 篇文章，按系列顺序阅读。</p></header>
+    <ol class="series-posts">
+      {posts.map((post, index) => <li><span>{post.data.seriesOrder ?? index + 1}</span><PostCard post={post} /></li>)}
+    </ol>
+    <a class="button secondary" href={withBase('/series')}>← 所有系列</a>
+  </div>
+</BaseLayout>
+
+<style>
+  .series-posts { display: grid; gap: 42px; margin: 0 0 54px; padding: 0; list-style: none; }
+  .series-posts li { display: grid; grid-template-columns: 46px 1fr; gap: 18px; align-items: start; }
+  .series-posts li > span { display: grid; place-items: center; width: 36px; aspect-ratio: 1; border: 1px solid var(--line); border-radius: 50%; color: var(--accent); font-weight: 700; }
+</style>

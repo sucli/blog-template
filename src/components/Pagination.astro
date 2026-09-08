@@ -8,14 +8,22 @@ interface Props {
 
 const { currentPage, totalPages } = Astro.props;
 const pageHref = (page: number) => withBase(page === 1 ? '/posts' : `/posts/page/${page}`);
+const visiblePages = totalPages <= 7
+  ? Array.from({ length: totalPages }, (_, index) => index + 1)
+  : Array.from(new Set([1, currentPage - 1, currentPage, currentPage + 1, totalPages]))
+      .filter((page) => page >= 1 && page <= totalPages)
+      .sort((a, b) => a - b);
 ---
 
 {totalPages > 1 && (
   <nav class="pagination" aria-label="文章分页">
     {currentPage > 1 ? <a class="page-control" href={pageHref(currentPage - 1)}>← 上一页</a> : <span class="page-control disabled" aria-disabled="true">← 上一页</span>}
     <div class="page-numbers">
-      {Array.from({ length: totalPages }, (_, index) => index + 1).map((page) => (
-        <a class:list={{ current: page === currentPage }} href={pageHref(page)} aria-current={page === currentPage ? 'page' : undefined}>{page}</a>
+      {visiblePages.map((page, index) => (
+        <>
+          {index > 0 && page - visiblePages[index - 1] > 1 && <span class="ellipsis" aria-hidden="true">…</span>}
+          <a class:list={{ current: page === currentPage }} href={pageHref(page)} aria-current={page === currentPage ? 'page' : undefined}>{page}</a>
+        </>
       ))}
     </div>
     {currentPage < totalPages ? <a class="page-control" href={pageHref(currentPage + 1)}>下一页 →</a> : <span class="page-control disabled" aria-disabled="true">下一页 →</span>}
@@ -28,6 +36,7 @@ const pageHref = (page: number) => withBase(page === 1 ? '/posts' : `/posts/page
   .page-numbers a { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 50%; color: var(--muted); font-size: .88rem; font-weight: 700; }
   .page-numbers a:hover { color: var(--text); background: var(--surface-soft); }
   .page-numbers a.current { color: var(--bg); background: var(--accent-strong); }
+  .ellipsis { display: grid; place-items: center; width: 24px; color: var(--muted); }
   .page-control { color: var(--text); font-size: .88rem; font-weight: 700; white-space: nowrap; }
   a.page-control:hover { color: var(--accent); }
   .disabled { color: var(--muted); opacity: .45; }

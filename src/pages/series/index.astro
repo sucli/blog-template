@@ -1,0 +1,25 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getSeries, seriesToSlug, visiblePosts } from '../../utils/posts';
+import { withBase } from '../../config';
+
+const series = getSeries(visiblePosts(await getCollection('posts')));
+---
+
+<BaseLayout title="系列" description="按系列浏览连续文章。">
+  <div class="container">
+    <header class="page-heading"><p class="eyebrow">Article series</p><h1>系列文章</h1><p>把相关主题串成一条可以持续阅读的路径。</p></header>
+    {series.length ? <div class="series-list">
+      {series.map((item) => <a href={withBase(`/series/${seriesToSlug(item.name)}`)}><strong>{item.name}</strong><span>{item.posts.length} 篇文章 →</span></a>)}
+    </div> : <div class="empty-state">还没有系列文章。</div>}
+  </div>
+</BaseLayout>
+
+<style>
+  .series-list { border-top: 1px solid var(--line); }
+  .series-list a { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 24px 4px; border-bottom: 1px solid var(--line); }
+  .series-list a:hover strong, .series-list a:hover span { color: var(--accent); }
+  .series-list strong { font-size: 1.3rem; }
+  .series-list span { color: var(--muted); font-size: .88rem; }
+</style>

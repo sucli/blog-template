@@ -3,15 +3,22 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
+  "packageManager": "npm@10.9.0",
   "engines": {
-    "node": ">=22.0.0"
+    "node": ">=22.12.0"
   },
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
-    "build": "astro check && astro build",
+    "init": "node scripts/init-blog.mjs",
+    "build": "npm run check:assets && astro check && astro build",
     "preview": "astro preview",
-    "check": "astro check"
+    "check": "astro check",
+    "check:assets": "node scripts/check-assets.mjs",
+    "check:links": "node scripts/check-links.mjs",
+    "test": "vitest run",
+    "index:search": "node scripts/index-search.mjs",
+    "validate": "npm run test && npm run build && npm run index:search && npm run check:links"
   },
   "dependencies": {
     "@astrojs/mdx": "^7.0.5",
@@ -21,6 +28,8 @@
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.10",
-    "typescript": "^6.0.3"
+    "parse5": "^8.0.1",
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.10"
   }
 }
