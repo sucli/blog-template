@@ -2,10 +2,11 @@ import { access, readdir, readFile } from 'node:fs/promises';
 import { extname, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parse } from 'parse5';
+import { resolveSiteBase } from './site-base.mjs';
 
 const root = new URL('../dist/', import.meta.url);
 const rootPath = fileURLToPath(root);
-const basePath = (process.env.BASE_PATH ?? '/').replace(/^\/+|\/+$/g, '');
+const basePath = resolveSiteBase().replace(/^\/+|\/+$/g, '');
 const htmlFiles = [];
 
 async function collect(directory) {
