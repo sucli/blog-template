@@ -87,6 +87,8 @@ const isActive = (href: string) => routePath === href || routePath.startsWith(`$
     const next = root.dataset.theme === 'dark' ? 'light' : 'dark';
     root.dataset.theme = next;
     localStorage.setItem('theme', next);
+    const meta = document.getElementById('theme-color-meta');
+    if (meta) meta.setAttribute('content', next === 'dark' ? '#111412' : '#f7f7f2');
     updateThemeButton();
   });
 

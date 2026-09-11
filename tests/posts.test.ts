@@ -1,10 +1,21 @@
 import { describe, expect, it } from 'vitest';
 import type { Post } from '../src/utils/posts';
-import { formatDate, formatMonthDay, getAllTags, getSeries, tagToSlug, visiblePosts } from '../src/utils/posts';
+import {
+  formatDate,
+  formatMonthDay,
+  getAllTags,
+  getRelatedPosts,
+  getSeries,
+  postBodyText,
+  tagToSlug,
+  visiblePosts
+} from '../src/utils/posts';
+import { markdownToRssHtml } from '../src/utils/rss-html';
 
-function post(id: string, pubDate: string, options: { draft?: boolean; tags?: string[]; series?: string; seriesOrder?: number } = {}) {
+function post(id: string, pubDate: string, options: { draft?: boolean; tags?: string[]; series?: string; seriesOrder?: number; body?: string } = {}) {
   return {
     id,
+    body: options.body,
     data: {
       title: id,
       description: id,
@@ -53,5 +64,40 @@ describe('post utilities', () => {
       ['Astro', ['first', 'second']],
       ['Other', ['other']]
     ]);
+  });
+
+  it('extracts searchable plain text from markdown bodies', () => {
+    const sample = post('sample', '2026-01-01', {
+      body: 'import Callout from "./x";\n\n## 标题\n\n这是一段**正文**，包含[链接](/posts/other)和`代码`。\n\n```ts\nconst secret = "skip";\n```\n'
+    });
+    const text = postBodyText(sample);
+    expect(text).toContain('这是一段正文');
+    expect(text).toContain('链接');
+    expect(text).not.toContain('secret');
+    expect(text).not.toContain('import');
+  });
+
+  it('ranks related posts by shared tags and series boost', () => {
+    const current = post('current', '2026-03-01', { tags: ['Astro', '写作'], series: 'Astro 实践' });
+    const posts = [
+      current,
+      post('same-series', '2026-02-01', { tags: ['其他'], series: 'Astro 实践' }),
+      post('shared-two', '2026-01-01', { tags: ['Astro', '写作'] }),
+      post('shared-one', '2026-01-02', { tags: ['Astro'] }),
+      post('unrelated', '2026-01-03', { tags: ['生活'] })
+    ];
+    expect(getRelatedPosts(current, posts, 3).map(({ id }) => id)).toEqual([
+      'shared-two',
+      'shared-one',
+      'same-series'
+    ]);
+  });
+});
+
+describe('rss html', () => {
+  it('rewrites root-relative links against site origin and base path', () => {
+    const html = markdownToRssHtml('阅读 [文章](/posts/other) 与 ![图](/covers/a.png)', new URL('https://example.com'), '/blog');
+    expect(html).toContain('href="https://example.com/blog/posts/other"');
+    expect(html).toContain('src="https://example.com/blog/covers/a.png"');
   });
 });

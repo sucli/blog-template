@@ -41,7 +41,9 @@ const socialImageURL = socialImage ? new URL(withBase(socialImage), Astro.site) 
     <meta name="viewport" content="width=device-width" />
     <meta name="generator" content={Astro.generator} />
     <meta name="description" content={description} />
-    <meta name="theme-color" content="#435c4d" />
+    <meta name="theme-color" content="#f7f7f2" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#111412" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" id="theme-color-meta" content="#f7f7f2" />
     <link rel="icon" type="image/svg+xml" href={withBase('/favicon.svg')} />
     {noindex ? <meta name="robots" content="noindex,follow" /> : <link rel="canonical" href={canonicalURL} />}
     <link rel="alternate" type="application/rss+xml" title={SITE.title} href={withBase('/rss.xml')} />
@@ -66,13 +68,17 @@ const socialImageURL = socialImage ? new URL(withBase(socialImage), Astro.site) 
       (() => {
         const stored = localStorage.getItem('theme');
         const dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        document.documentElement.dataset.theme = stored || (dark ? 'dark' : 'light');
+        const theme = stored || (dark ? 'dark' : 'light');
+        document.documentElement.dataset.theme = theme;
+        const meta = document.getElementById('theme-color-meta');
+        if (meta) meta.setAttribute('content', theme === 'dark' ? '#111412' : '#f7f7f2');
       })();
     </script>
   </head>
   <body>
+    <a class="skip-link" href="#main">跳到主要内容</a>
     <Header />
-    <main class="page-shell"><slot /></main>
+    <main id="main" class="page-shell"><slot /></main>
     <Footer />
     <script>
       const blocks = document.querySelectorAll('.prose pre');

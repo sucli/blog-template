@@ -6,8 +6,45 @@
   "locale": "zh-CN",
   "siteUrl": "https://example.com",
   "postsPerPage": 9,
+  "nav": [
+    { "label": "文章", "href": "/posts" },
+    { "label": "系列", "href": "/series" },
+    { "label": "标签", "href": "/tags" },
+    { "label": "归档", "href": "/archive" },
+    { "label": "关于", "href": "/about" }
+  ],
   "social": {
     "github": "https://github.com/your-name",
-    "x": "https://x.com/your-name"
+    "x": "https://x.com/your-name",
+    "weibo": "",
+    "zhihu": "",
+    "bilibili": "",
+    "juejin": ""
+  },
+  "comments": {
+    "enabled": false,
+    "repo": "",
+    "repoId": "",
+    "category": "",
+    "categoryId": "",
+    "mapping": "pathname",
+    "theme": "preferred_color_scheme"
+  },
+  "relatedPosts": {
+    "enabled": true,
+    "limit": 3
+  },
+  "about": {
+    "intro": "欢迎来到 {title}。这里用来记录我正在学习的技术、值得分享的创作过程，以及那些不想被时间冲走的想法。",
+    "sections": [
+      {
+        "title": "为什么写作",
+        "body": "写作迫使人把模糊的直觉变成清晰的表达。公开写作还能让知识流动起来，连接到拥有相似问题和兴趣的人。"
+      },
+      {
+        "title": "联系我",
+        "body": "如果你想讨论文章中的内容、指出错误或只是打个招呼，欢迎发送邮件到 {email}。"
+      }
+    ]
   }
 }

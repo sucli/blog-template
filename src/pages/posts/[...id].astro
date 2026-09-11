@@ -1,24 +1,36 @@
 ---
 import { getCollection, render } from 'astro:content';
 import PostLayout from '../../layouts/PostLayout.astro';
-import { getSeries, visiblePosts } from '../../utils/posts';
+import { getRelatedPostsOptions } from '../../config';
+import { getRelatedPosts, getSeries, visiblePosts } from '../../utils/posts';
 
 export async function getStaticPaths() {
   const posts = visiblePosts(await getCollection('posts'));
   const seriesMap = new Map(getSeries(posts).map((item) => [item.name, item.posts]));
+  const { enabled, limit } = getRelatedPostsOptions();
   return posts.map((post, index) => ({
     params: { id: post.id },
     props: {
       post,
       previousPost: posts[index - 1],
       nextPost: posts[index + 1],
-      seriesPosts: post.data.series ? seriesMap.get(post.data.series) ?? [] : []
+      seriesPosts: post.data.series ? seriesMap.get(post.data.series) ?? [] : [],
+      relatedPosts: enabled ? getRelatedPosts(post, posts, limit) : []
     }
   }));
 }
 
-const { post, previousPost, nextPost, seriesPosts } = Astro.props;
+const { post, previousPost, nextPost, seriesPosts, relatedPosts } = Astro.props;
 const { Content, headings } = await render(post);
 ---
 
-<PostLayout post={post} headings={headings} previousPost={previousPost} nextPost={nextPost} seriesPosts={seriesPosts}><Content /></PostLayout>
+<PostLayout
+  post={post}
+  headings={headings}
+  previousPost={previousPost}
+  nextPost={nextPost}
+  seriesPosts={seriesPosts}
+  relatedPosts={relatedPosts}
+>
+  <Content />
+</PostLayout>
