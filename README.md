@@ -1,21 +1,41 @@
 # Paperwind Blog Template
 
-一个专注于内容、速度和可部署性的开源博客模板。基于 Astro、TypeScript 与 Markdown/MDX，无数据库、无后台服务，适合个人博客、技术专栏和团队日志。
+<p align="center">
+  <strong>An open-source Astro blog template focused on content, speed, and deployability</strong>
+</p>
 
-## 特性
+<p align="center">
+  Markdown / MDX · TypeScript · No database · SEO & RSS out of the box
+</p>
 
-- Markdown / MDX 写作与类型安全的文章元数据
-- 响应式设计、深色模式和无 JavaScript 基础阅读体验
-- 首页、文章列表、标签、归档、搜索、关于与 404 页面
-- 可配置的静态文章分页
-- 文章目录、相邻文章导航、定时发布与更新时间
-- 独立搜索索引，不把全部文章内容塞入搜索页 HTML
-- 可选 Pagefind 搜索增强，未安装时自动使用内置轻量搜索
-- RSS、Sitemap、Open Graph、Canonical URL 和结构化数据
-- GitHub Pages 自动部署工作流
-- 同样可部署到 Vercel、Netlify、Cloudflare Pages 等静态托管平台
+<p align="center">
+  <a href="./README.zh-CN.md">简体中文</a>
+</p>
 
-## 快速开始
+<p align="center">
+  <a href="https://github.com/sucli/blog-template/blob/main/LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-435c4d"></a>
+  <a href="https://astro.build"><img alt="Astro 7" src="https://img.shields.io/badge/Astro-7-ff5d01"></a>
+  <img alt="Node >= 22.12" src="https://img.shields.io/badge/Node-%3E%3D%2022.12-339933">
+  <a href="https://github.com/sucli/blog-template/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/sucli/blog-template/actions/workflows/ci.yml/badge.svg"></a>
+</p>
+
+A blog template for independent writers and developers: no database, no admin backend. Every post lives as Markdown in your Git repository.
+
+## Features
+
+- Markdown / MDX writing with type-safe frontmatter
+- Responsive layout, dark mode, skip link, and a near-zero-JS reading experience
+- Home, posts, series, tags, archive, search, about, and 404 pages
+- Site nav, social links, about copy, optional comments, and related posts in `site.config.json`
+- Configurable static pagination
+- Table of contents, prev/next posts, series navigation, scheduled publishing, and updated dates
+- Client search over title, description, tags, series, and body text
+- Full-content RSS, Sitemap, PNG Open Graph images, and JSON-LD
+- Optional Giscus comments
+- Tag-overlap related posts on each article
+- GitHub Pages workflow; works with Vercel / Netlify / Cloudflare Pages too
+
+## Quick start
 
 ```bash
 npm install
@@ -23,95 +43,218 @@ npm run init
 npm run dev
 ```
 
-访问 `http://localhost:4321`。
+Open `http://localhost:4321`.
 
-## 创建你的博客
+### Create your blog
 
-1. 在 GitHub 仓库页面点击 **Use this template**。
-2. 运行 `npm run init`，填写网站名称、作者、域名和社交链接。
-3. 在 `src/content/posts` 中添加自己的 `.md` 或 `.mdx` 文件。
-4. 将代码推送到 `main` 分支。
-5. 在 GitHub 仓库的 **Settings → Pages → Build and deployment** 中选择 **GitHub Actions**。
+1. Click **Use this template** on GitHub.
+2. Run `npm run init` to set title, author, domain, nav, and social links. About copy lives under `about` in `site.config.json`.
+3. Add `.md` or `.mdx` files under `src/content/posts`.
+4. Push to `main`.
+5. In the repo **Settings → Pages → Build and deployment**, choose **GitHub Actions**.
 
-文章格式：
+Post format:
 
 ```md
 ---
-title: 我的第一篇文章
-description: 一句话摘要，用于列表与 SEO。
+title: My first post
+description: One-line summary for lists and SEO.
 pubDate: 2026-07-31
-tags: [Astro, 博客]
+tags: [Astro, Blog]
 cover: /covers/welcome.png
-coverAlt: 描述封面内容的替代文本
-series: Astro 内容网站实践
+coverAlt: Describe the cover image
+series: Building with Astro
 seriesOrder: 1
 draft: false
 ---
 
-从这里开始写正文。
+Start writing here.
 ```
 
-`draft: true` 的文章不会出现在生产构建中，但开发环境仍然可见。
-发布日期晚于构建时间的文章会被视为定时文章，只在到达发布日期后进入生产构建。设置 `updatedDate` 后，文章页会显示最近更新时间。
-设置 `series` 和 `seriesOrder` 可以将文章编排为系列，模板会生成系列索引、系列详情页和上一篇/下一篇导航。
+- `draft: true` hides the post from production builds but keeps it visible in dev.
+- Future `pubDate` values are treated as scheduled posts.
+- Optional `updatedDate` shows a “last updated” line.
+- `series` + `seriesOrder` power series index pages and in-series navigation.
+- Posts without a cover fall back to a letter mark on cards.
 
-MDX 文章可以使用内置提示框：
+MDX posts can use the built-in callout:
 
 ```mdx
 import Callout from '../../components/Callout.astro';
 
-<Callout type="tip" title="阅读建议">
-  这里放一段提示内容。
+<Callout type="tip" title="Reading tip">
+  Put a short note here.
 </Callout>
 ```
 
-文章中的代码块会自动显示复制按钮。
+Code blocks get a copy button automatically.
 
-站点资料和每页文章数量保存在根目录的 `site.config.json`。
+### Site configuration
 
-## 常用命令
+`site.config.json` holds site identity, nav, social links, comments, related posts, about copy, and pagination:
 
-| 命令 | 用途 |
+```json
+{
+  "title": "Paperwind",
+  "description": "An independent blog about tech, craft, and daily notes.",
+  "author": "Your Name",
+  "email": "hello@example.com",
+  "locale": "en-US",
+  "siteUrl": "https://example.com",
+  "postsPerPage": 9,
+  "nav": [
+    { "label": "Posts", "href": "/posts" },
+    { "label": "About", "href": "/about" }
+  ],
+  "social": {
+    "github": "https://github.com/your-name",
+    "x": "https://x.com/your-name",
+    "weibo": "",
+    "zhihu": "",
+    "bilibili": "",
+    "juejin": ""
+  },
+  "comments": {
+    "enabled": false,
+    "repo": "",
+    "repoId": "",
+    "category": "",
+    "categoryId": "",
+    "mapping": "pathname",
+    "theme": "preferred_color_scheme"
+  },
+  "relatedPosts": {
+    "enabled": true,
+    "limit": 3
+  },
+  "about": {
+    "intro": "Welcome to {title}. …",
+    "sections": [
+      { "title": "Why write", "body": "…" },
+      { "title": "Contact", "body": "Email me at {email}." }
+    ]
+  }
+}
+```
+
+About text supports `{title}`, `{author}`, and `{email}` placeholders. Empty social links are hidden automatically.
+
+### Optional Giscus comments
+
+1. Install and authorize [Giscus](https://giscus.app) for your repository.
+2. Copy `repo`, `repoId`, `category`, and `categoryId` from the site.
+3. Set `comments.enabled` to `true` in `site.config.json`.
+
+Comments render on post pages only and stay disabled until you enable them.
+
+### Related posts
+
+Enabled by default. Posts are ranked by shared tags (same-series posts get a small boost). Tune `relatedPosts.limit` or set `enabled: false`.
+
+## Math and diagrams
+
+Paperwind ships without KaTeX or Mermaid so the default bundle stays small. Add them only if you need them.
+
+### KaTeX (MDX)
+
+```bash
+npm install remark-math rehype-katex katex
+```
+
+```js
+// astro.config.mjs
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
+
+export default defineConfig({
+  markdown: {
+    remarkPlugins: [remarkMath],
+    rehypePlugins: [rehypeKatex]
+  }
+});
+```
+
+Import KaTeX CSS once in `src/layouts/BaseLayout.astro`:
+
+```astro
+import 'katex/dist/katex.min.css';
+```
+
+Then write `$E = mc^2$` or `$$…$$` blocks in Markdown/MDX.
+
+### Mermaid (MDX)
+
+Prefer rendering Mermaid as an Astro component so diagrams stay static HTML:
+
+```bash
+npm install mermaid
+```
+
+Create `src/components/Mermaid.astro` that mounts Mermaid client-side on a `pre.mermaid` block, then use it from MDX:
+
+```mdx
+import Mermaid from '../../components/Mermaid.astro';
+
+<Mermaid chart={`graph TD
+  A[Write] --> B[Build]
+  B --> C[Publish]`} />
+```
+
+Alternatively, use `astro-mermaid` or a remark plugin if you want fenced ` ```mermaid ` blocks processed automatically.
+
+## Scripts
+
+| Command | Purpose |
 | --- | --- |
-| `npm run dev` | 启动本地开发服务器 |
-| `npm run init` | 交互式初始化博客资料与示例内容 |
-| `npm run build` | 类型检查并生成生产站点 |
-| `npm run preview` | 本地预览生产构建 |
-| `npm run check` | 检查 Astro 与 TypeScript |
-| `npm run test` | 运行工具函数测试 |
-| `npm run validate` | 执行测试、构建与内部链接检查 |
+| `npm run dev` | Start the local dev server |
+| `npm run init` | Interactively set up site identity and sample content |
+| `npm run build` | Type-check and build the production site |
+| `npm run preview` | Preview the production build |
+| `npm run check` | Run Astro + TypeScript checks |
+| `npm run test` | Run unit tests |
+| `npm run validate` | Tests, build, search indexing, and link checks |
 
-搜索默认使用内置 JSON 索引。若需要 Pagefind 的全文检索能力，可执行 `npm install -D pagefind`，之后 `npm run validate` 会在构建后自动生成 Pagefind 索引资源。
+Search uses the built-in JSON index (title, description, tags, series, body). To also emit Pagefind assets:
 
-## 部署
+```bash
+npm install -D pagefind
+npm run validate
+```
+
+The search page still uses the built-in index by default; wire Pagefind in yourself if you want its full-text engine.
+
+Social share images prefer the post cover PNG, then fall back to `public/og-default.png`. `/og/{slug}.svg` remains available as a lightweight preview asset.
+
+## Deploy
 
 ### GitHub Pages
 
-仓库已经包含 `.github/workflows/deploy.yml`。工作流会自动识别仓库子路径，无需手动修改 `base`。
+`.github/workflows/deploy.yml` is included. It detects repository subpaths automatically — no manual `base` edits.
 
 ### Vercel / Netlify / Cloudflare Pages
 
 - Build command: `npm run build`
 - Output directory: `dist`
-- Node.js: `22.12.0` 或更高版本
-- 环境变量 `SITE_URL`: 你的生产域名
-- 环境变量 `BASE_PATH`: `/`
+- Node.js: `22.12.0` or newer
+- `SITE_URL`: production origin
+- `BASE_PATH`: `/`
 
-## 目录结构
+## Project layout
 
 ```text
 src/
-├── components/       可复用组件
-├── content/posts/    Markdown / MDX 文章
-├── layouts/          页面与文章布局
-├── pages/            文件路由
-├── styles/           全局样式
-├── content.config.ts 内容模型
-└── config.ts         配置读取与路径工具
-site.config.json      网站资料与分页配置
+├── components/       reusable UI (header, footer, comments, callout…)
+├── content/posts/    Markdown / MDX posts
+├── layouts/          page and post layouts
+├── pages/            file-based routes
+├── styles/           global CSS
+├── utils/            post and RSS helpers
+├── content.config.ts content model
+└── config.ts         site config helpers
+site.config.json      identity, nav, social, comments, related posts, about
 ```
 
-提交改动前建议运行 `npm run validate`。该命令会依次执行工具函数测试、类型检查、生产构建和内部链接检查。
+Run `npm run validate` before opening a PR.
 
 ## License
 

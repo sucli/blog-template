@@ -28,6 +28,7 @@ try {
     locale: await ask('语言区域', current.locale),
     siteUrl: await ask('站点 URL', current.siteUrl),
     social: {
+      ...current.social,
       github: await askOptional('GitHub 链接', current.social.github),
       x: await askOptional('X 链接', current.social.x)
     }

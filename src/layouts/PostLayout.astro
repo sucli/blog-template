@@ -1,5 +1,7 @@
 ---
 import BaseLayout from './BaseLayout.astro';
+import Comments from '../components/Comments.astro';
+import PostCard from '../components/PostCard.astro';
 import type { MarkdownHeading } from 'astro';
 import type { Post } from '../utils/posts';
 import { formatDate, getReadingTime, seriesToSlug, tagToSlug } from '../utils/posts';
@@ -11,8 +13,9 @@ interface Props {
   previousPost?: Post;
   nextPost?: Post;
   seriesPosts?: Post[];
+  relatedPosts?: Post[];
 }
-const { post, headings = [], previousPost, nextPost, seriesPosts = [] } = Astro.props;
+const { post, headings = [], previousPost, nextPost, seriesPosts = [], relatedPosts = [] } = Astro.props;
 const cover = post.data.cover ? withBase(post.data.cover) : undefined;
 const modifiedDate = post.data.updatedDate ?? post.data.pubDate;
 const tableOfContents = headings.filter((heading) => heading.depth === 2 || heading.depth === 3);
@@ -38,7 +41,7 @@ const seriesNext = seriesIndex >= 0 ? seriesPosts[seriesIndex + 1] : undefined;
   description={post.data.description}
   image={post.data.cover}
   imageAlt={post.data.coverAlt}
-  socialImage={`/og/${post.id}.svg`}
+  socialImage={post.data.cover ?? '/og-default.png'}
   article
   publishedTime={post.data.pubDate}
   modifiedTime={modifiedDate}
@@ -93,6 +96,19 @@ const seriesNext = seriesIndex >= 0 ? seriesPosts[seriesIndex + 1] : undefined;
       <a class="button secondary" href={withBase('/posts')}>← 返回全部文章</a>
     </footer>
 
+    {relatedPosts.length > 0 && (
+      <section class="related container" aria-label="相关文章">
+        <div class="section-heading row">
+          <div><p class="eyebrow">Keep reading</p><h2>相关文章</h2></div>
+        </div>
+        <div class="related-grid">
+          {relatedPosts.map((related) => <PostCard post={related} />)}
+        </div>
+      </section>
+    )}
+
+    <Comments />
+
     {(previousPost || nextPost) && (
       <nav class="post-navigation container" aria-label="相邻文章">
         {previousPost
@@ -134,11 +150,17 @@ const seriesNext = seriesIndex >= 0 ? seriesPosts[seriesIndex + 1] : undefined;
   .post-navigation span { color: var(--muted); font-size: .78rem; }
   .post-navigation strong { font-size: 1rem; }
   .post-navigation a:hover strong { color: var(--accent); }
+  .related { margin-top: 64px; }
+  .section-heading h2 { margin: 0; font-size: clamp(1.8rem, 4vw, 2.6rem); letter-spacing: -.045em; }
+  .section-heading p { margin-bottom: 3px; }
+  .related-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 40px 24px; }
+  @media (max-width: 900px) { .related-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
   @media (max-width: 680px) {
     .post-header { padding-top: 48px; }
     .hero-image { margin-top: 36px; margin-bottom: 42px; }
     .post-navigation { grid-template-columns: 1fr; }
     .post-navigation > span:empty { display: none; }
     .post-navigation a.next { text-align: left; }
+    .related-grid { grid-template-columns: 1fr; }
   }
 </style>

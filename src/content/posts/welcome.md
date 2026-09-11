@@ -24,7 +24,7 @@ featured: true
 
 ## 从这里开始
 
-先打开 `src/config.ts`，替换站点名称、作者、简介和社交链接。然后删除示例文章，在 `src/content/posts` 目录中新建 Markdown 文件。
+先运行 `npm run init`，或直接编辑根目录的 `site.config.json`，替换站点名称、作者、简介、导航、社交链接和关于页文案。然后删除示例文章，在 `src/content/posts` 目录中新建 Markdown 文件。
 
 ```md
 ---

@@ -54,6 +54,21 @@ img { display: block; max-width: 100%; }
 button, input { font: inherit; }
 ::selection { background: var(--accent); color: var(--bg); }
 
+.skip-link {
+  position: absolute;
+  left: 16px;
+  top: -48px;
+  z-index: 100;
+  border-radius: 999px;
+  padding: 10px 14px;
+  background: var(--accent-strong);
+  color: var(--bg);
+  font-size: .85rem;
+  font-weight: 700;
+  transition: top .15s ease;
+}
+.skip-link:focus { top: 12px; }
+
 .visually-hidden {
   position: absolute;
   width: 1px;

@@ -7,12 +7,12 @@ const searchIndexUrl = withBase('/search-index.json');
 
 <BaseLayout title="搜索" description="搜索站内文章。" noindex>
   <div class="container search-wrap" data-index-url={searchIndexUrl} data-locale={SITE.locale}>
-    <header class="page-heading"><p class="eyebrow">Find a story</p><h1>搜索</h1><p>输入标题、摘要或标签。</p></header>
+    <header class="page-heading"><p class="eyebrow">Find a story</p><h1>搜索</h1><p>输入标题、摘要、标签或正文关键词。</p></header>
     <label class="search-box">
       <span class="visually-hidden">搜索文章</span>
       <Icon name="search" />
       <input id="search-input" type="search" placeholder="例如：Astro、部署、写作…" autocomplete="off" autofocus />
-      <kbd aria-hidden="true">⌘ K</kbd>
+      <kbd id="search-kbd" aria-hidden="true">⌘ K</kbd>
     </label>
     <p id="search-count" class="count" aria-live="polite" aria-atomic="true">正在加载文章…</p>
     <div id="search-results" class="results"></div>
@@ -42,6 +42,10 @@ const searchIndexUrl = withBase('/search-index.json');
   const results = document.querySelector<HTMLElement>('#search-results');
   const count = document.querySelector<HTMLElement>('#search-count');
   const empty = document.querySelector<HTMLElement>('#search-empty');
+  const shortcut = document.querySelector<HTMLElement>('#search-kbd');
+  if (shortcut && !/Mac|iPhone|iPad|iPod/i.test(navigator.platform)) {
+    shortcut.textContent = 'Ctrl K';
+  }
   interface SearchPost { title: string; description: string; date: string; href: string; search: string }
   let posts: SearchPost[] = [];
   const locale = wrapper?.dataset.locale;

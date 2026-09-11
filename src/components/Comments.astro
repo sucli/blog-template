@@ -1,0 +1,34 @@
+---
+import { getCommentsConfig } from '../config';
+
+const comments = getCommentsConfig();
+---
+
+{comments && (
+  <section class="comments container" aria-label="文章评论">
+    <script
+      is:inline
+      src="https://giscus.app/client.js"
+      data-repo={comments.repo}
+      data-repo-id={comments.repoId}
+      data-category={comments.category}
+      data-category-id={comments.categoryId}
+      data-mapping={comments.mapping}
+      data-strict="0"
+      data-reactions-enabled="1"
+      data-emit-metadata="0"
+      data-input-position="bottom"
+      data-theme={comments.theme}
+      data-lang="zh-CN"
+      crossorigin="anonymous"
+      async
+    />
+  </section>
+)}
+
+<style>
+  .comments { margin-top: 48px; padding-top: 8px; }
+  .comments :global(.giscus) { margin-top: 12px; }
+  .comments :global(.giscus-frame) { color-scheme: light; }
+  :global(:root[data-theme='dark']) .comments :global(.giscus-frame) { color-scheme: dark; }
+</style>

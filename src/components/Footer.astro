@@ -1,6 +1,9 @@
 ---
 import Icon from './Icon.astro';
-import { SITE, withBase } from '../config';
+import { SITE, getSocialLinks, withBase } from '../config';
+
+const socialLinks = getSocialLinks();
+const iconKeys = new Set(['github', 'x']);
 ---
 
 <footer>
@@ -10,8 +13,11 @@ import { SITE, withBase } from '../config';
       <p>© {new Date().getFullYear()} {SITE.author}. Built with Astro.</p>
     </div>
     <div class="links">
-      {SITE.social.github && <a href={SITE.social.github} aria-label="GitHub"><Icon name="github" /></a>}
-      {SITE.social.x && <a href={SITE.social.x} aria-label="X"><Icon name="x" /></a>}
+      {socialLinks.map((item) => (
+        iconKeys.has(item.key)
+          ? <a href={item.href} aria-label={item.label} rel="noopener noreferrer" target="_blank"><Icon name={item.key as 'github' | 'x'} /></a>
+          : <a class="text-link" href={item.href} rel="noopener noreferrer" target="_blank">{item.label}</a>
+      ))}
       <a href={withBase('/rss.xml')} aria-label="RSS"><Icon name="rss" /></a>
     </div>
   </div>
@@ -19,10 +25,11 @@ import { SITE, withBase } from '../config';
 
 <style>
   footer { margin-top: 90px; border-top: 1px solid var(--line); }
-  .footer-inner { display: flex; align-items: center; justify-content: space-between; min-height: 130px; gap: 20px; }
+  .footer-inner { display: flex; align-items: center; justify-content: space-between; min-height: 130px; gap: 20px; flex-wrap: wrap; }
   strong { font-size: .95rem; }
   p { margin: 3px 0 0; color: var(--muted); font-size: .82rem; }
-  .links { display: flex; gap: 8px; }
-  .links a { display: grid; place-items: center; width: 38px; height: 38px; border: 1px solid var(--line); border-radius: 50%; color: var(--muted); }
+  .links { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+  .links a { display: grid; place-items: center; min-width: 38px; height: 38px; padding: 0 10px; border: 1px solid var(--line); border-radius: 999px; color: var(--muted); }
   .links a:hover { color: var(--text); border-color: var(--accent); }
+  .text-link { font-size: .78rem; font-weight: 600; }
 </style>
