@@ -8,3 +8,12 @@ updates:
       npm-dependencies:
         patterns:
           - '*'
+    ignore:
+      # @astrojs/check peer 尚未支持 TypeScript 7
+      - dependency-name: typescript
+        update-types:
+          - version-update:semver-major
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly

@@ -1,0 +1,39 @@
+name: Bug report
+description: 报告模板缺陷或构建问题
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        感谢反馈。请尽量提供复现步骤，便于快速定位。
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: 问题描述
+      description: 发生了什么？预期行为是什么？
+      placeholder: 构建失败 / 页面样式异常 / 配置读取错误…
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: 复现步骤
+      placeholder: |
+        1. npm install
+        2. npm run dev
+        3. 打开 …
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: 环境
+      placeholder: "Node 22.19.0 / macOS 15 / Chrome 140"
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: 相关日志或截图
+      render: shell

@@ -1,0 +1,21 @@
+name: Question
+description: 使用模板时的疑问（配置、写作、部署）
+title: "[Question]: "
+labels: ["question"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        使用问题优先看 [README](https://github.com/sucli/blog-template#readme) 与 [README.zh-CN](https://github.com/sucli/blog-template/blob/main/README.zh-CN.md)。
+  - type: textarea
+    id: question
+    attributes:
+      label: 你的问题
+      description: 尽量写清你已经尝试过什么、卡在哪一步。
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: 相关配置或代码片段
+      render: markdown

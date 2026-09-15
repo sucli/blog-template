@@ -15,7 +15,7 @@
 <p align="center">
   <a href="https://github.com/sucli/blog-template/blob/main/LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-435c4d"></a>
   <a href="https://astro.build"><img alt="Astro 7" src="https://img.shields.io/badge/Astro-7-ff5d01"></a>
-  <img alt="Node >= 22.12" src="https://img.shields.io/badge/Node-%3E%3D%2022.12-339933">
+  <img alt="Node >= 22.19" src="https://img.shields.io/badge/Node-%3E%3D%2022.19-339933">
   <a href="https://github.com/sucli/blog-template/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/sucli/blog-template/actions/workflows/ci.yml/badge.svg"></a>
 </p>
 
@@ -228,7 +228,7 @@ import Mermaid from '../../components/Mermaid.astro';
 
 - Build command: `npm run build`
 - Output directory: `dist`
-- Node.js: `22.12.0` 或更高版本
+- Node.js: `22.19.0` 或更高版本
 - 环境变量 `SITE_URL`: 你的生产域名
 - 环境变量 `BASE_PATH`: `/`
 
